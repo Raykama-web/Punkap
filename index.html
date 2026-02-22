@@ -126,11 +126,8 @@ h1{
   margin-top:60px;
   overflow:hidden;
   position:relative;
-}
-
-.carousel-track{
   display:flex;
-  transition:transform 0.6s ease;
+  scroll-behavior:smooth;
 }
 
 .carousel img{
@@ -206,25 +203,24 @@ Punkap — Магазин всех твоих фетишей для гиков �
 <div>Фигурки • Значки • Стикеры • Постеры • Плюшевые игрушки • Акриловые фигурки • Медиаторы • Кружки • Брелоки • Украшения</div>
 </div>
 
-<div class="carousel">
-  <div class="carousel-track" id="carouselTrack">
-    <img src="1.jpg">
-    <img src="2.jpg">
-    <img src="3.jpg">
-    <img src="4.jpg">
-    <img src="5.jpg">
-    <img src="6.jpg">
-    <img src="7.jpg">
-    <img src="8.jpg">
-    <img src="9.jpg">
-    <img src="10.jpg">
-    <img src="11.jpg">
-    <img src="12.jpg">
-    <img src="13.jpg">
-    <img src="14.jpg">
-    <img src="15.jpg">
-    <img src="16.jpg">
-  </div>
+<!-- CAROUSEL -->
+<div class="carousel" id="carouselTrack">
+  <img src="1.jpg" alt="Фото 1">
+  <img src="2.jpg" alt="Фото 2">
+  <img src="3.jpg" alt="Фото 3">
+  <img src="4.jpg" alt="Фото 4">
+  <img src="5.jpg" alt="Фото 5">
+  <img src="6.jpg" alt="Фото 6">
+  <img src="7.jpg" alt="Фото 7">
+  <img src="8.jpg" alt="Фото 8">
+  <img src="9.jpg" alt="Фото 9">
+  <img src="10.jpg" alt="Фото 10">
+  <img src="11.jpg" alt="Фото 11">
+  <img src="12.jpg" alt="Фото 12">
+  <img src="13.jpg" alt="Фото 13">
+  <img src="14.jpg" alt="Фото 14">
+  <img src="15.jpg" alt="Фото 15">
+  <img src="16.jpg" alt="Фото 16">
 </div>
 
 <div class="buttons">
@@ -257,50 +253,42 @@ window.onload = function(){
   }
 };
 
-/* CAROUSEL LOGIC */
-const track = document.getElementById('carouselTrack');
-let slides = Array.from(track.children);
-let index = 0;
-let startX = 0;
+// CAROUSEL LOGIC
+const carousel = document.getElementById('carouselTrack');
 let isDragging = false;
+let startX;
+let scrollLeft;
 
-function updateCarousel(){
-  const slideWidth = slides[0].offsetWidth + 20;
-  track.style.transform = `translateX(-${index * slideWidth}px)`;
-}
-
-function nextSlide(){
-  index = (index + 1) % slides.length;
-  updateCarousel();
-}
-
-let autoSlide = setInterval(nextSlide, 3000);
-
-track.addEventListener('touchstart', e=>{
-  clearInterval(autoSlide);
-  startX = e.touches[0].clientX;
+carousel.addEventListener('touchstart', e => {
+  clearInterval(autoScroll);
   isDragging = true;
+  startX = e.touches[0].pageX - carousel.offsetLeft;
+  scrollLeft = carousel.scrollLeft;
 });
 
-track.addEventListener('touchmove', e=>{
+carousel.addEventListener('touchmove', e => {
   if(!isDragging) return;
-  let diff = startX - e.touches[0].clientX;
-  if(Math.abs(diff) > 50){
-    if(diff > 0){
-      index = (index + 1) % slides.length;
-    }else{
-      index = (index - 1 + slides.length) % slides.length;
-    }
-    updateCarousel();
-    isDragging = false;
+  const x = e.touches[0].pageX - carousel.offsetLeft;
+  const walk = (startX - x);
+  carousel.scrollLeft = scrollLeft + walk;
+});
+
+carousel.addEventListener('touchend', e => {
+  isDragging = false;
+  autoScroll = setInterval(scrollCarousel, 3000);
+});
+
+function scrollCarousel() {
+  const slideWidth = carousel.querySelector('img').offsetWidth + 20;
+  if(carousel.scrollLeft + carousel.offsetWidth >= carousel.scrollWidth) {
+    carousel.scrollTo({left: 0, behavior: 'smooth'});
+  } else {
+    carousel.scrollBy({left: slideWidth, behavior: 'smooth'});
   }
-});
+}
 
-
-track.addEventListener('touchend', ()=>{
-  autoSlide = setInterval(nextSlide, 3000);
-});
+let autoScroll = setInterval(scrollCarousel, 3000);
 </script>
 
 </body>
-  </html>
+</html>
